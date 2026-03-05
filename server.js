@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ====== CONFIG GEMINI ======
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY_HERE';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyABw7MFMsvPR8F8XT4dtMvcqVMMc0AZf0c';
 // Bạn NÊN dùng biến môi trường trên Stackblitz / .env, không commit key thật.
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -35,7 +35,7 @@ const upload = multer({
 
 // ====== HELPER: CALL GEMINI TEXT→IMAGE ======
 async function geminiTextToImage(prompt, options = {}) {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AIzaSyABw7MFMsvPR8F8XT4dtMvcqVMMc0AZf0c') {
     throw new Error('GEMINI_API_KEY chưa được cấu hình.');
   }
 
@@ -93,7 +93,7 @@ Hãy tạo một ảnh duy nhất, phong cách ${style}, tỉ lệ ${ratio}, đ�
 
 // ====== HELPER: GEMINI MULTIMODAL (IMAGE + TEXT) ======
 async function geminiImageEditOrAssist(images, prompt, mode = 'edit') {
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AIzaSyABw7MFMsvPR8F8XT4dtMvcqVMMc0AZf0c') {
     throw new Error('GEMINI_API_KEY chưa được cấu hình.');
   }
 
@@ -297,9 +297,10 @@ app.get('*', (req, res) => {
 // Start
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
-  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AIzaSyABw7MFMsvPR8F8XT4dtMvcqVMMc0AZf0c') {
     console.warn(
       '⚠️  GEMINI_API_KEY chưa được cấu hình. Hãy đặt biến môi trường GEMINI_API_KEY.'
     );
   }
 });
+
