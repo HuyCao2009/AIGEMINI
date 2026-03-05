@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Realistix AI Studio • Gemini Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-orb"></div>
+        <div>
+          <h1>Realistix AI Studio</h1>
+          <p>Tạo ảnh realistic, faceswap & chỉnh sửa với Gemini AI thật.</p>
+        </div>
+      </div>
+      <div class="header-badge">Gemini • Node • Vanilla JS</div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="generate">Tạo ảnh realistic</button>
+      <button class="tab" data-tab="faceswap">Faceswap (Gemini assist)</button>
+      <button class="tab" data-tab="edit">Chỉnh sửa ảnh</button>
+    </nav>
+
+    <main class="tab-panels">
+      <!-- TAB 1: Generate -->
+      <section class="tab-panel active" id="tab-generate">
+        <div class="panel-grid">
+          <form id="form-generate" class="card form-card">
+            <h2>Tạo ảnh từ mô tả (Gemini)</h2>
+            <p class="subtitle">
+              Nhập mô tả chi tiết, chọn phong cách & tỷ lệ khung. Ảnh được tạo bởi Gemini AI.
+            </p>
+
+            <label class="field">
+              <span>Prompt mô tả</span>
+              <textarea
+                id="gen-prompt"
+                rows="4"
+                placeholder="Ví dụ: Chân dung siêu thực của một cô gái châu Á trong quán cà phê, ánh sáng cinematic..."
+                required
+              ></textarea>
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Phong cách</span>
+                <select id="gen-style">
+                  <option value="realistic">Realistic</option>
+                  <option value="cinematic">Cinematic</option>
+                  <option value="studio">Studio portrait</option>
+                  <option value="street">Street photography</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Tỷ lệ khung</span>
+                <select id="gen-ratio">
+                  <option value="1:1">1:1 (Square)</option>
+                  <option value="16:9">16:9 (Landscape)</option>
+                  <option value="9:16">9:16 (Vertical)</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field">
+              <span>Chất lượng</span>
+              <select id="gen-quality">
+                <option value="high">High (đề xuất)</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+
+            <button type="submit" class="btn primary" id="btn-generate">
+              <span class="btn-label">Generate ảnh realistic (Gemini)</span>
+              <span class="btn-spinner"></span>
+            </button>
+
+            <p class="hint">
+              Yêu cầu: bạn phải cấu hình <code>GEMINI_API_KEY</code> trên backend.
+            </p>
+          </form>
+
+          <div class="card preview-card">
+            <div class="preview-header">
+              <h3>Kết quả</h3>
+              <span id="gen-status" class="status-pill">Chưa có ảnh</span>
+            </div>
+
+            <div class="preview-body">
+              <div class="skeleton skeleton-image hidden" id="gen-skeleton"></div>
+              <img
+                id="gen-image"
+                class="preview-image hidden"
+                alt="Generated preview"
+              />
+            </div>
+
+            <div class="preview-meta" id="gen-meta">
+              Nhập prompt và bấm Generate để bắt đầu.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Faceswap (Gemini assist) -->
+      <section class="tab-panel" id="tab-faceswap">
+        <div class="panel-grid">
+          <form id="form-faceswap" class="card form-card">
+            <h2>Faceswap (Gemini trợ giúp)</h2>
+            <p class="subtitle">
+              Tải ảnh nguồn & ảnh đích. Gemini sẽ phân tích và mô tả chi tiết faceswap, bạn có thể dùng để điều khiển model faceswap khác.
+            </p>
+
+            <label class="field">
+              <span>Ảnh nguồn (khuôn mặt)</span>
+              <input
+                type="file"
+                id="fs-source"
+                accept="image/*"
+                required
+              />
+            </label>
+
+            <label class="field">
+              <span>Ảnh đích</span>
+              <input
+                type="file"
+                id="fs-target"
+                accept="image/*"
+                required
+              />
+            </label>
+
+            <label class="field">
+              <span>Yêu cầu / ghi chú thêm (tùy chọn)</span>
+              <textarea
+                id="fs-prompt"
+                rows="2"
+                placeholder="Ví dụ: Giữ ánh sáng và màu da tự nhiên, khuôn mặt trông thật nhất có thể..."
+              ></textarea>
+            </label>
+
+            <button type="submit" class="btn primary" id="btn-faceswap">
+              <span class="btn-label">Gửi tới Gemini để phân tích faceswap</span>
+              <span class="btn-spinner"></span>
+            </button>
+
+            <p class="hint">
+              Gemini hiện chưa có API faceswap trực tiếp, nhưng có thể phân tích & mô tả kết quả mong muốn.
+            </p>
+          </form>
+
+          <div class="card preview-card">
+            <div class="preview-header">
+              <h3>Phân tích & hướng dẫn từ Gemini</h3>
+              <span id="fs-status" class="status-pill">Chưa chạy</span>
+            </div>
+
+            <div class="preview-body triple">
+              <div class="preview-col">
+                <span class="preview-label">Nguồn</span>
+                <div class="skeleton skeleton-thumb" id="fs-src-skeleton"></div>
+                <img
+                  id="fs-src-image"
+                  class="preview-image small hidden"
+                  alt="Source face"
+                />
+              </div>
+              <div class="preview-col">
+                <span class="preview-label">Đích</span>
+                <div class="skeleton skeleton-thumb" id="fs-tgt-skeleton"></div>
+                <img
+                  id="fs-tgt-image"
+                  class="preview-image small hidden"
+                  alt="Target face"
+                />
+              </div>
+              <div class="preview-col">
+                <span class="preview-label">Mô tả Gemini</span>
+                <div class="preview-meta" id="fs-meta">
+                  Chưa có mô tả. Tải ảnh và bấm nút để Gemini phân tích.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Edit -->
+      <section class="tab-panel" id="tab-edit">
+        <div class="panel-grid">
+          <form id="form-edit" class="card form-card">
+            <h2>Chỉnh sửa ảnh theo yêu cầu (Gemini)</h2>
+            <p class="subtitle">
+              Tải ảnh lên và mô tả yêu cầu chỉnh sửa. Gemini sẽ tạo lại ảnh mới mô phỏng ảnh gốc đã được chỉnh.
+            </p>
+
+            <label class="field">
+              <span>Ảnh cần chỉnh</span>
+              <input
+                type="file"
+                id="ed-image"
+                accept="image/*"
+                required
+              />
+            </label>
+
+            <label class="field">
+              <span>Yêu cầu chỉnh sửa</span>
+              <textarea
+                id="ed-prompt"
+                rows="3"
+                placeholder="Ví dụ: Xóa chiếc cốc trên bàn và làm nền mờ nhẹ..."
+                required
+              ></textarea>
+            </label>
+
+            <button type="submit" class="btn primary" id="btn-edit">
+              <span class="btn-label">Chỉnh sửa ảnh với Gemini</span>
+              <span class="btn-spinner"></span>
+            </button>
+
+            <p class="hint">
+              Hiện đang dùng text→image để tạo lại ảnh mới theo mô tả. Khi Gemini hỗ trợ image editing trực tiếp, bạn có thể nâng cấp backend.
+            </p>
+          </form>
+
+          <div class="card preview-card">
+            <div class="preview-header">
+              <h3>Trước & Sau</h3>
+              <span id="ed-status" class="status-pill">Chưa chỉnh</span>
+            </div>
+
+            <div class="preview-body double">
+              <div class="preview-col">
+                <span class="preview-label">Ảnh gốc</span>
+                <div class="skeleton skeleton-thumb" id="ed-src-skeleton"></div>
+                <img
+                  id="ed-src-image"
+                  class="preview-image small hidden"
+                  alt="Original image"
+                />
+              </div>
+              <div class="preview-col">
+                <span class="preview-label">Ảnh sau chỉnh (Gemini)</span>
+                <div class="skeleton skeleton-thumb hidden" id="ed-out-skeleton"></div>
+                <img
+                  id="ed-out-image"
+                  class="preview-image small hidden"
+                  alt="Edited image"
+                />
+              </div>
+            </div>
+
+            <div class="preview-meta" id="ed-meta">
+              Mô tả yêu cầu chỉnh sửa và bấm nút để xem kết quả từ Gemini.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Realistix AI Studio • Gemini Edition</span>
+      <span>Full-stack • Node + Express + Vanilla JS</span>
+    </footer>
+  </div>
+
+  <div class="bg-orbit"></div>
+  <div class="bg-noise"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
